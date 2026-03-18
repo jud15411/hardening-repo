@@ -1,0 +1,21 @@
+vms:
+  - name: linux-test-01
+    os: linux
+    template: tmpl-ubuntu-2204-cloudinit
+    vmid: 2001
+    cores: 2
+    memory: 4096
+    disk: 40G
+    network:
+      bridge: vmbr0
+
+  - name: win-test-01
+    os: windows
+    template: tmpl-win2022-cloudbase
+    vmid: 3001
+    cores: 4
+    memory: 8192
+    disk: 60G
+    network:
+      bridge: vmbr0
+

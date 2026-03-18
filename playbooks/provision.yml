@@ -1,0 +1,15 @@
+- name: Provision VMs on Proxmox
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - inventories/vms.yml
+
+  tasks:
+    - name: Create all defined VMs
+      include_role:
+        name: proxmox_create_vm
+      loop: "{{ vms }}"
+      loop_control:
+        loop_var: vm

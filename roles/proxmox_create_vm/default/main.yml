@@ -1,0 +1,5 @@
+proxmox_host: pve.example.edu
+proxmox_node: pve
+proxmox_storage: local-lvm
+proxmox_bridge: vmbr0
+

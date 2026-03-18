@@ -1,0 +1,55 @@
+- name: Clone VM from template
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_host }}"
+    api_user: "{{ proxmox_user }}"
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    node: "{{ proxmox_node }}"
+    clone: "{{ vm.template }}"
+    vmid: "{{ vm.vmid }}"
+    name: "{{ vm.name }}"
+    cores: "{{ vm.cores }}"
+    memory: "{{ vm.memory }}"
+    scsihw: virtio-scsi-pci
+    onboot: true
+    timeout: 300
+  register: clone_result
+
+# ---------- LINUX CLOUD-INIT ----------
+- name: Inject Linux cloud-init (SSH key)
+  when: vm.os == "linux"
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_host }}"
+    api_user: "{{ proxmox_user }}"
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vm.vmid }}"
+    ciuser: ansible
+    sshkeys: "{{ lookup('file', '/ssh/semaphore.pub') }}"
+    ipconfig0: "ip=dhcp"
+
+# ---------- WINDOWS CLOUDBASE-INIT ----------
+- name: Inject Windows cloud-init (password + WinRM)
+  when: vm.os == "windows"
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_host }}"
+    api_user: "{{ proxmox_user }}"
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vm.vmid }}"
+    ciuser: Administrator
+    cipassword: "{{ windows_admin_password }}"
+    ipconfig0: "ip=dhcp"
+
+# ---------- START VM ----------
+- name: Start VM
+  community.general.proxmox_kvm:
+    api_host: "{{ proxmox_host }}"
+    api_user: "{{ proxmox_user }}"
+    api_token_id: "{{ proxmox_token_id }}"
+    api_token_secret: "{{ proxmox_token_secret }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vm.vmid }}"
+    state: started
