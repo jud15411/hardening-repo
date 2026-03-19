@@ -6,7 +6,7 @@
     api_token_secret: "{{ proxmox_token_secret }}"
     node: "{{ proxmox_node }}"
     clone: "{{ vm.template }}"
-    vmid: "{{ vm.vmid }}"
+    newid: "{{ vm.vmid }}"
     name: "{{ vm.name }}"
     cores: "{{ vm.cores }}"
     memory: "{{ vm.memory }}"
