@@ -27,7 +27,8 @@
     vmid: "{{ vm.vmid }}"
     ciuser: ansible
     sshkeys: "{{ lookup('file', '/ssh/semaphore.pub') }}"
-    ipconfig0: "ip=dhcp"
+    ipconfig: 
+      ip: dhcp
 
 # ---------- WINDOWS CLOUDBASE-INIT ----------
 - name: Inject Windows cloud-init (password + WinRM)
@@ -41,7 +42,8 @@
     vmid: "{{ vm.vmid }}"
     ciuser: Administrator
     cipassword: "{{ windows_admin_password }}"
-    ipconfig0: "ip=dhcp"
+    ipconfig: 
+      ip: dhcp
 
 # ---------- START VM ----------
 - name: Start VM
