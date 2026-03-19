@@ -4,7 +4,7 @@
   gather_facts: false
 
   vars_files:
-    - inventories/vms.yml
+    - ../inventories/vms.yml
 
   tasks:
     - name: Create all defined VMs
