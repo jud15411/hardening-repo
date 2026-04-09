@@ -2,8 +2,6 @@
 #############################
 # PLAY 1 — PROVISION VMs
 #############################
-
-
 - name: Provision VMs on Proxmox
   hosts: localhost
   connection: local
@@ -23,7 +21,7 @@
               windows:
                 hosts: {}
 
-    - name: Create all defined VMs
+    - name: Create all VMs
       include_role:
         name: proxmox_create_vm
         tasks_from: create.yml
@@ -31,7 +29,7 @@
       loop_control:
         loop_var: vm
 
-    - name: Discover VM IPs and build inventory
+    - name: Discover VM IPs and build runtime inventory
       include_role:
         name: proxmox_create_vm
         tasks_from: discover.yml
@@ -39,22 +37,17 @@
       loop_control:
         loop_var: vm
 
-    - name: Write runtime inventory file
+    - name: Write runtime inventory to disk
       copy:
         dest: ../inventories/runtime.yml
         content: "{{ runtime_inventory | to_nice_yaml }}"
 
-
 #############################
 # PLAY 2 — CIS-CAT ASSESSMENT
 #############################
-
-
-- name: CIS-CAT Baseline Assessment
+- name: CIS-CAT Level 1 Baseline Assessment
   hosts: all
   gather_facts: true
-  vars_files:
-    - ../inventories/runtime.yml
 
   roles:
     - cis_cat
