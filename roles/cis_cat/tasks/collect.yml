@@ -1,0 +1,16 @@
+
+- name: Fetch CIS-CAT reports (Linux)
+  fetch:
+    src: "{{ cis_cat_report_dir }}"
+    dest: artifacts/cis-cat/{{ inventory_hostname }}/baseline
+    flat: no
+  when: ansible_os_family != "Windows"
+
+
+
+- name: Fetch CIS-CAT reports (Windows)
+  fetch:
+    src: C:\CIS-CAT\reports
+    dest: artifacts/cis-cat/{{ inventory_hostname }}/baseline
+    flat: no
+  when: ansible_os_family == "Windows"

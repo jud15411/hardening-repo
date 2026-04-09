@@ -1,0 +1,11 @@
+- name: Create CIS-CAT report directory (Windows)
+  win_file:
+    path: C:\CIS-CAT\reports
+    state: directory
+
+- name: Run CIS-CAT Lite (Windows)
+  win_command: >
+    java -jar C:\CIS-CAT\Assessor-CLI.jar
+    -b benchmarks\{{ cis_cat_windows_benchmark }}
+    -p "{{ cis_cat_profile }}"
+    -o C:\CIS-CAT\reports

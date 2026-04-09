@@ -1,0 +1,10 @@
+
+- import_tasks: install.yml
+
+- import_tasks: assess_linux.yml
+  when: ansible_os_family != "Windows"
+
+- import_tasks: assess_windows.yml
+  when: ansible_os_family == "Windows"
+
+- import_tasks: collect.yml

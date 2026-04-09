@@ -1,0 +1,14 @@
+- name: Create CIS-CAT report directory (Linux)
+  file:
+    path: "{{ cis_cat_report_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Run CIS-CAT Lite (Linux)
+  command: >
+    ./Assessor-CLI.sh
+    -b benchmarks/{{ cis_cat_linux_benchmark }}
+    -p "{{ cis_cat_profile }}"
+    -o "{{ cis_cat_report_dir }}"
+  args:
+    chdir: "{{ cis_cat_install_dir }}/Assessor"

@@ -1,0 +1,32 @@
+- name: Ensure Java is installed (Linux)
+  package:
+    name: openjdk-11-jre-headless
+    state: present
+  when: ansible_os_family != "Windows"
+
+- name: Create CIS-CAT directory
+  file:
+    path: "{{ cis_cat_install_dir }}"
+    state: directory
+    mode: '0755'
+  when: ansible_os_family != "Windows"
+
+- name: Copy CIS-CAT Assessor to Linux VM
+  synchronize:
+    src: "{{ cis_cat_src_dir }}/"
+    dest: "{{ cis_cat_install_dir }}/Assessor/"
+    recursive: yes
+  when: ansible_os_family != "Windows"
+
+- name: Ensure CIS-CAT CLI is executable
+  file:
+    path: "{{ cis_cat_install_dir }}/Assessor/Assessor-CLI.sh"
+    mode: '0755'
+  when: ansible_os_family != "Windows"
+
+
+- name: Copy CIS-CAT Assessor to Windows VM
+  win_copy:
+    src: "{{ cis_cat_src_dir }}"
+    dest: C:\CIS-CAT
+  when: ansible_os_family == "Windows"
