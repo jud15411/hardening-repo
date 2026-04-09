@@ -1,3 +1,4 @@
+
 - name: Provision VMs on Proxmox
   hosts: localhost
   connection: local
@@ -7,9 +8,28 @@
     - ../inventories/vms.yml
 
   tasks:
+    - name: Initialize runtime inventory
+      set_fact:
+        runtime_inventory:
+          all:
+            children:
+              linux:
+                hosts: {}
+              windows:
+                hosts: {}
+
     - name: Create all defined VMs
       include_role:
         name: proxmox_create_vm
+        tasks_from: create.yml
+      loop: "{{ vms }}"
+      loop_control:
+        loop_var: vm
+
+    - name: Discover VM IPs and build inventory
+      include_role:
+        name: proxmox_create_vm
+        tasks_from: discover.yml
       loop: "{{ vms }}"
       loop_control:
         loop_var: vm
@@ -18,4 +38,3 @@
       copy:
         dest: ../inventories/runtime.yml
         content: "{{ runtime_inventory | to_nice_yaml }}"
-
