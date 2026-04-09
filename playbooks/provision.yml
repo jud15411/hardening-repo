@@ -13,3 +13,9 @@
       loop: "{{ vms }}"
       loop_control:
         loop_var: vm
+
+    - name: Write runtime inventory file
+      copy:
+        dest: ../inventories/runtime.yml
+        content: "{{ runtime_inventory | to_nice_yaml }}"
+

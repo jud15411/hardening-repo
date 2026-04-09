@@ -1,3 +1,15 @@
+
+- name: Initialize runtime inventory structure
+  set_fact:
+    runtime_inventory:
+      all:
+        children:
+          linux:
+            hosts: {}
+          windows:
+            hosts: {}
+
+
 - name: Clone VM from template
   community.general.proxmox_kvm:
     api_host: "{{ proxmox_host }}"
@@ -55,3 +67,84 @@
     node: "{{ proxmox_node }}"
     vmid: "{{ vm.vmid }}"
     state: started
+
+# ------- QUERY PROXMOX FOR VM DETAILS ---------
+
+- name: Query Proxmox for VM details
+  community.general.proxmox_vm_info:
+    api_user: "{{ proxmox_api_user }}"
+    api_token_id: "{{ proxmox_api_token_id }}"
+    api_token_secret: "{{ proxmox_api_token_secret }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vm.vmid }}"
+  register: vm_info
+
+
+# ---------- WAIT FOR VM TO HAVE IP ADDRESS ---------
+- name: Wait for VM to report an IPv4 address
+  community.general.proxmox_vm_info:
+    api_user: "{{ proxmox_api_user }}"
+    api_token_id: "{{ proxmox_api_token_id }}"
+    api_token_secret: "{{ proxmox_api_token_secret }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ vm.vmid }}"
+  register: vm_info
+  until: >
+    vm_info.vms is defined and
+    vm_info.vms[0].guest_interfaces is defined and
+    (
+      vm_info.vms[0].guest_interfaces
+      | map(attribute='ip-addresses')
+      | flatten
+      | selectattr('ip-address-type', 'equalto', 'ipv4')
+      | rejectattr('ip-address', 'match', '^127\\.')
+      | list
+      | length
+    ) > 0
+  retries: 30
+  delay: 10
+
+
+# ---------- EXTRACT IP ADDRESS ----------
+
+- name: Extract VM IPv4 address
+  set_fact:
+    vm_ipv4: >-
+      {{
+        vm_info.vms[0].guest_interfaces
+        | map(attribute='ip-addresses')
+        | flatten
+        | selectattr('ip-address-type', 'equalto', 'ipv4')
+        | rejectattr('ip-address', 'match', '^127\\.')
+        | map(attribute='ip-address')
+        | list
+        | first
+      }}
+
+
+# -------- ADD TO RUNTIME INVENTORY ----------
+
+
+- name: Add VM to runtime inventory
+  set_fact:
+    runtime_inventory: >-
+      {{
+        runtime_inventory
+        | combine({
+            'all': {
+              'children': {
+                vm.os: {
+                  'hosts': {
+                    vm.name: {
+                      'ansible_host': vm_ipv4,
+                      'ansible_user': (vm.os == 'windows') | ternary('Administrator', 'semaphore')
+                    }
+                  }
+                }
+              }
+            }
+          }, recursive=True)
+      }}
+
