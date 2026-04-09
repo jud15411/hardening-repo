@@ -15,7 +15,8 @@
     var: vm_info
 
 
-- name: Wait for VM to report an IPv4 address (robust)
+
+- name: Wait for VM to report IPv4 (corrected)
   community.general.proxmox_vm_info:
     api_user: "{{ proxmox_user }}"
     api_token_id: "{{ proxmox_token_id }}"
@@ -26,24 +27,14 @@
   register: vm_info
   until: >
     (
-      vm_info.vms[0].guest_interfaces is defined and
+      vm_info.proxmox_vms is defined and
+      vm_info.proxmox_vms[0].guest_interfaces is defined and
       (
-        vm_info.vms[0].guest_interfaces
+        vm_info.proxmox_vms[0].guest_interfaces
         | map(attribute='ip-addresses')
         | flatten
         | selectattr('ip-address-type', 'equalto', 'ipv4')
         | rejectattr('ip-address', 'match', '^127\\.')
-        | list
-        | length
-      ) > 0
-    )
-    or
-    (
-      vm_info.vms[0].network is defined and
-      (
-        vm_info.vms[0].network
-        | map(attribute='ip')
-        | select('match', '^[0-9]+\\.')
         | list
         | length
       ) > 0
@@ -58,25 +49,13 @@
   set_fact:
     vm_ipv4: >-
       {{
-        (
-          vm_info.vms[0].guest_interfaces
-          | default([])
-          | map(attribute='ip-addresses')
-          | flatten
-          | selectattr('ip-address-type', 'equalto', 'ipv4')
-          | rejectattr('ip-address', 'match', '^127\\.')
-          | map(attribute='ip-address')
-          | list
-        )
-        |
-        default(
-          vm_info.vms[0].network
-          | default([])
-          | map(attribute='ip')
-          | select('match', '^[0-9]+\\.')
-          | list,
-          true
-        )
+        vm_info.proxmox_vms[0].guest_interfaces
+        | map(attribute='ip-addresses')
+        | flatten
+        | selectattr('ip-address-type', 'equalto', 'ipv4')
+        | rejectattr('ip-address', 'match', '^127\\.')
+        | map(attribute='ip-address')
+        | list
         | first
       }}
 
