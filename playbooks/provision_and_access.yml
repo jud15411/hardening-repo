@@ -1,4 +1,9 @@
 
+#############################
+# PLAY 1 — PROVISION VMs
+#############################
+
+
 - name: Provision VMs on Proxmox
   hosts: localhost
   connection: local
@@ -38,3 +43,18 @@
       copy:
         dest: ../inventories/runtime.yml
         content: "{{ runtime_inventory | to_nice_yaml }}"
+
+
+#############################
+# PLAY 2 — CIS-CAT ASSESSMENT
+#############################
+
+
+- name: CIS-CAT Baseline Assessment
+  hosts: all
+  gather_facts: true
+  vars_files:
+    - ../inventories/runtime.yml
+
+  roles:
+    - cis_cat

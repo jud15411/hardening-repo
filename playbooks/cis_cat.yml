@@ -1,7 +1,0 @@
-
-- name: CIS-CAT Level 1 Baseline Assessment
-  hosts: all
-  gather_facts: true
-
-  roles:
-    - cis_cat
