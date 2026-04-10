@@ -16,9 +16,11 @@
     timeout: 1800
 
 
+
 - name: Ensure QEMU guest agent is enabled
-  command: qm set {{ vm.vmid }} --agent enabled=1
+  command: /usr/sbin/qm set {{ vm.vmid }} --agent enabled=1
   delegate_to: proxmox01
+  become: true
 
 
 - name: Inject Linux cloud-init

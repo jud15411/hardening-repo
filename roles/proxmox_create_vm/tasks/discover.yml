@@ -16,7 +16,7 @@
 
 
 - name: Wait for VM to be running
-  command: qm status {{ vm.vmid }}
+  command: /usr/sbin/qm status {{ vm.vmid }}
   delegate_to: proxmox01
   register: vm_status
   until: "'running' in vm_status.stdout"
@@ -27,7 +27,7 @@
 
 - name: Query VM IP via QEMU guest agent (CLI)
   shell: >
-    qm agent {{ vm.vmid }} network-get-interfaces
+    /usr/sbin/qm agent {{ vm.vmid }} network-get-interfaces
   delegate_to: proxmox01
   register: qm_agent_output
   until: >
