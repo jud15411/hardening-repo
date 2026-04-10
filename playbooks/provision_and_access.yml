@@ -9,7 +9,6 @@
 
   vars_files:
     - ../inventories/vms.yml
-  inventory:
     - ../inventories/proxmox_host.yml
 
   tasks:
