@@ -18,6 +18,8 @@
 - name: Wait for VM to be running
   command: /usr/sbin/qm status {{ vm.vmid }}
   delegate_to: proxmox01
+  vars:
+    ansible_connection: ssh
   register: vm_status
   until: "'running' in vm_status.stdout"
   retries: 30
@@ -29,6 +31,8 @@
   shell: >
     /usr/sbin/qm agent {{ vm.vmid }} network-get-interfaces
   delegate_to: proxmox01
+  vars:
+    ansible_connection: ssh
   register: qm_agent_output
   until: >
     qm_agent_output.rc == 0 and
