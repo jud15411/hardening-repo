@@ -16,11 +16,7 @@
 
 
 
-
-
-
-
-- name: Query VM IP via QEMU guest agent (via Proxmox node 1)
+- name: Query VM IP via QEMU guest agent (CLI)
   command: >
     qm agent {{ vm.vmid }} network-get-interfaces
   delegate_to: proxmox01
@@ -39,8 +35,6 @@
     ) > 0
   retries: 60
   delay: 10
-
-
 
 - name: Extract VM IPv4 address
   set_fact:
