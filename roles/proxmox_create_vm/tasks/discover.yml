@@ -17,20 +17,17 @@
 
 
 
-- name: Wait for VM to report IP via QEMU guest agent
-  community.general.proxmox_qemu_agent:
-    api_host: "{{ proxmox_host }}"
-    api_user: "{{ proxmox_user }}"
-    api_token_id: "{{ proxmox_token_id }}"
-    api_token_secret: "{{ proxmox_token_secret }}"
-    node: "{{ proxmox_node }}"
-    vmid: "{{ vm.vmid }}"
-    command: network-get-interfaces
-  register: vm_agent_info
+
+- name: Query VM IP via QEMU guest agent (CLI)
+  command: >
+    qm agent {{ vm.vmid }} network-get-interfaces
+  delegate_to: "{{ proxmox_node }}"
+  register: qm_agent_output
   until: >
-    vm_agent_info.result is defined and
+    qm_agent_output.stdout is defined and
     (
-      vm_agent_info.result
+      qm_agent_output.stdout
+      | from_json
       | map(attribute='ip-addresses')
       | flatten
       | selectattr('ip-address-type', 'equalto', 'ipv4')
@@ -43,11 +40,13 @@
 
 
 
-- name: Extract VM IPv4 address from guest agent
+
+- name: Extract VM IPv4 address
   set_fact:
     vm_ipv4: >-
       {{
-        vm_agent_info.result
+        qm_agent_output.stdout
+        | from_json
         | map(attribute='ip-addresses')
         | flatten
         | selectattr('ip-address-type', 'equalto', 'ipv4')
