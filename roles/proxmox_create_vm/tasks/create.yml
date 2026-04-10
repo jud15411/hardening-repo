@@ -20,8 +20,6 @@
 - name: Ensure QEMU guest agent is enabled
   command: /usr/sbin/qm set {{ vm.vmid }} --agent enabled=1
   delegate_to: proxmox01
-  become: true
-
 
 - name: Inject Linux cloud-init
   when: vm.os == "linux"
