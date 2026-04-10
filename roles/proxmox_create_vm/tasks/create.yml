@@ -16,11 +16,6 @@
     timeout: 1800
 
 
-
-- name: Ensure QEMU guest agent is enabled
-  command: /usr/sbin/qm set {{ vm.vmid }} --agent enabled=1
-  delegate_to: proxmox01
-
 - name: Inject Linux cloud-init
   when: vm.os == "linux"
   community.general.proxmox_kvm:
@@ -58,3 +53,8 @@
     node: "{{ proxmox_node }}"
     vmid: "{{ vm.vmid }}"
     state: started
+
+
+- name: Ensure QEMU guest agent is enabled
+  command: /usr/sbin/qm set {{ vm.vmid }} --agent enabled=1
+  delegate_to: proxmox01
