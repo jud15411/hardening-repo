@@ -27,24 +27,23 @@
 
 
 
+
 - name: Query VM IP via QEMU guest agent (CLI)
-  shell: >
-    /usr/sbin/qm agent {{ vm.vmid }} network-get-interfaces
-  delegate_to: 192.168.100.2
-  vars:
-    ansible_connection: ssh
+  shell: /usr/sbin/qm agent {{ vm.vmid }} network-get-interfaces
+  delegate_to: proxmox01
   register: qm_agent_output
   until: >
     qm_agent_output.rc == 0 and
     (
       qm_agent_output.stdout
       | from_json
-      | json_query('result[]."ip-addresses"[? "ip-address-type"==`ipv4` && !"127.0.0.1".contains(@."ip-address")]')
+      | json_query(
+          '[]."ip-addresses"[? "ip-address-type"==`ipv4` && !"127.".contains(@."ip-address")]'
+        )
       | length
     ) > 0
   retries: 60
   delay: 10
-
 
 
 - name: Extract VM IPv4 address
@@ -54,7 +53,7 @@
         qm_agent_output.stdout
         | from_json
         | json_query(
-            'result[]."ip-addresses"[? "ip-address-type"==`ipv4` && !"127.0.0.1".contains(@."ip-address")]."ip-address"'
+            '[]."ip-addresses"[? "ip-address-type"==`ipv4` && !"127.".contains(@."ip-address")]."ip-address"'
           )
         | first
       }}
