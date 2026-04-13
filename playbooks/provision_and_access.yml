@@ -42,7 +42,6 @@
       copy:
         dest: ../inventories/runtime.yml
         content: "{{ runtime_inventory | to_nice_yaml }}"
-
 #############################
 # PLAY 2 — CIS-CAT ASSESSMENT
 #############################

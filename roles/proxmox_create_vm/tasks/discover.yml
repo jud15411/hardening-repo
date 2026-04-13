@@ -76,7 +76,7 @@
                     vm.name: {
                       'ansible_host': vm_ipv4,
                       'ansible_user': (vm.os == 'windows')
-                        | ternary('Administrator', 'ansible')
+                        | ternary('Administrator', 'semaphore')
                     }
                   }
                 }
@@ -84,3 +84,11 @@
             }
           }, recursive=True)
       }}
+
+
+- name: Add VM to ANSIBLE runtime inventory
+  add_host:
+    name: "{{ vm.name }}"
+    groups: "{{ vm.os }}"
+    ansible_host: "{{ vm_ipv4 }}"
+    ansible_user: "{{ 'Administrator' if vm.os == 'windows' else 'semaphore' }}"
