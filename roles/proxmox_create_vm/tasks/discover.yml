@@ -26,8 +26,6 @@
   delay: 5
 
 
-
-
 - name: Query VM IP via QEMU guest agent (CLI)
   shell: /usr/sbin/qm agent {{ vm.vmid }} network-get-interfaces
   delegate_to: proxmox01
@@ -38,7 +36,7 @@
       qm_agent_output.stdout
       | from_json
       | json_query(
-          '[]."ip-addresses"[? "ip-address-type"==`ipv4` && !"127.".contains(@."ip-address")]'
+          '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]'
         )
       | length
     ) > 0
@@ -53,7 +51,7 @@
         qm_agent_output.stdout
         | from_json
         | json_query(
-            '[]."ip-addresses"[? "ip-address-type"==`ipv4` && !"127.".contains(@."ip-address")]."ip-address"'
+            '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]."ip-address"'
           )
         | first
       }}
