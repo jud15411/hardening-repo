@@ -45,18 +45,29 @@
   delay: 10
 
 
-
 - name: Extract VM IPv4 address
   set_fact:
     vm_ipv4: >-
       {{
-        qm_agent_output.stdout
-        | from_json
-        | json_query(
-            '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]."ip-address"'
-          )
-        | first
+        (
+          qm_agent_output.stdout
+          | from_json
+          | json_query(
+              '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]."ip-address"'
+            )
+        )[0] | default('')
       }}
+
+
+- name: Assert VM IPv4 address was discovered
+  assert:
+    that:
+      - vm_ipv4 is string
+      - vm_ipv4 | length > 0
+    fail_msg: >
+      No IPv4 address discovered for {{ vm.name }} via QEMU guest agent.
+      Guest agent returned:
+      {{ qm_agent_output.stdout }}
 
 
 - name: DEBUG extracted IP
