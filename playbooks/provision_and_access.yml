@@ -47,7 +47,7 @@
 # PLAY 2 — CIS-CAT ASSESSMENT
 #############################
 - name: CIS-CAT Level 1 Baseline Assessment
-  hosts: all
+  hosts: linux:windows
   gather_facts: true
 
   roles:
