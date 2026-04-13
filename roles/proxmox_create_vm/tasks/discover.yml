@@ -28,7 +28,7 @@
 
 - name: Query VM IP via QEMU guest agent (CLI)
   shell: /usr/sbin/qm agent {{ vm.vmid }} network-get-interfaces
-  delegate_to: proxmox01
+  delegate_to: 192.168.100.2
   register: qm_agent_output
   until: >
     qm_agent_output.rc == 0 and
@@ -42,6 +42,7 @@
     ) > 0
   retries: 60
   delay: 10
+
 
 
 - name: Extract VM IPv4 address
