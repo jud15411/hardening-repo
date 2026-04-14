@@ -49,13 +49,13 @@
   set_fact:
     vm_ipv4: >-
       {{
-        (
-          qm_agent_output.stdout
-          | from_json
-          | json_query(
-              '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]."ip-address"'
-            )
-        )[0] | default('')
+        qm_agent_output.stdout
+        | from_json
+        | json_query(
+            '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]."ip-address"'
+          )
+        | first
+        | default('', true)
       }}
 
 
