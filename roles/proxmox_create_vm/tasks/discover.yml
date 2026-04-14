@@ -52,7 +52,7 @@
         qm_agent_output.stdout
         | from_json
         | json_query(
-            '[]."ip-addresses"[? "ip-address-type"==`ipv4` && "ip-address"!=`127.0.0.1`]."ip-address"'
+            '[? name != `lo`]."ip-addresses"[? "ip-address-type"==`ipv4`]."ip-address"'
           )
         | first
         | default('', true)
