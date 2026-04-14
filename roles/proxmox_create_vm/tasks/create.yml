@@ -25,7 +25,7 @@
     api_token_secret: "{{ proxmox_token_secret }}"
     node: "{{ proxmox_node }}"
     vmid: "{{ vm.vmid }}"
-    ciuser: ansible
+    ciuser: semaphore
     sshkeys: "{{ lookup('file', '/ssh/semaphore.pub') }}"
     ipconfig:
       ip: dhcp
